@@ -207,6 +207,17 @@ A safer alternative to the rm command
   rm -rf old_project/            # 強制刪除目錄
   TRASH_DIR=/tmp/trash rm file   # 使用自訂垃圾桶目錄
 
+⚠️  免責聲明 (DISCLAIMER):
+  本工具按「現況」提供，不提供任何保證。
+  本工具不能取代完整的備份策略。
+  作者不對任何資料遺失負責，使用者需自行承擔風險。
+  請定期備份重要資料到外部儲存或雲端服務。
+  
+  This tool is provided "AS IS" without any warranty.
+  This tool CANNOT replace a complete backup strategy.
+  Author is not responsible for any data loss. Users assume all risks.
+  Always backup important data to external storage or cloud services.
+
 EOF
 }
 

@@ -97,6 +97,14 @@ install() {
     if [ -d "$INSTALL_DIR" ]; then
         info "發現現有安裝，正在更新... / Found existing installation, updating..."
         cd "$INSTALL_DIR"
+        # 檢查是否為有效的 git 儲存庫 (Check if it's a valid git repository)
+        if ! git status >/dev/null 2>&1; then
+            error "錯誤：$INSTALL_DIR 存在但不是有效的 git 儲存庫"
+            error "Error: $INSTALL_DIR exists but is not a valid git repository"
+            error "請手動刪除該目錄後重試：rm -rf $INSTALL_DIR"
+            error "Please manually remove the directory and try again: rm -rf $INSTALL_DIR"
+            exit 1
+        fi
         if git pull --quiet; then
             success "更新成功 / Updated successfully"
         else
@@ -134,7 +142,7 @@ install() {
     
     # 檢查別名是否已存在 (Check if alias already exists)
     local alias_line="alias rm='$INSTALL_DIR/better-rm'"
-    if grep -q "alias rm='$INSTALL_DIR/better-rm'" "$shell_config" 2>/dev/null; then
+    if grep -q "$alias_line" "$shell_config" 2>/dev/null; then
         info "別名已存在於 $shell_config / Alias already exists in $shell_config"
     else
         info "正在設定別名... / Setting up alias..."

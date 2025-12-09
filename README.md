@@ -17,54 +17,73 @@
 
 ## 安裝方式
 
-### 方法一：直接使用（推薦）
+### 方法一：使用別名（推薦）
 
-1. 下載 `rm` 腳本：
+這種方法最安全，不會覆蓋系統原生的 `rm` 命令，需要時仍可使用 `/bin/rm` 存取原始命令。
 
-```bash
-git clone https://github.com/doggy8088/better-rm.git
-cd better-rm
-```
-
-2. 將腳本複製到你的本地 bin 目錄：
+1. 複製專案到本地目錄：
 
 ```bash
-mkdir -p ~/bin
-cp rm ~/bin/
-chmod +x ~/bin/rm
+git clone https://github.com/doggy8088/better-rm.git ~/better-rm
 ```
 
-3. 確保 `~/bin` 在你的 PATH 環境變數中（在 `~/.bashrc` 或 `~/.zshrc` 中加入）：
+2. 設定別名，在 `~/.bashrc` 或 `~/.zshrc` 中加入以下內容：
 
 ```bash
-export PATH="$HOME/bin:$PATH"
+# 使用 better-rm 替代 rm 命令
+alias rm='~/better-rm/better-rm'
 ```
 
-4. 重新載入設定檔：
+3. 重新載入設定檔：
 
 ```bash
 source ~/.bashrc  # 或 source ~/.zshrc
 ```
 
-### 方法二：建立別名
-
-如果你不想覆蓋系統的 `rm` 命令，可以使用別名：
+4. 驗證安裝：
 
 ```bash
-# 在 ~/.bashrc 或 ~/.zshrc 中加入
-alias rm='/path/to/better-rm/rm'
-```
-
-### 驗證安裝
-
-執行以下命令確認安裝成功：
-
-```bash
-which rm
 rm --version
 ```
 
-應該會看到 better-rm 的版本資訊。
+應該會看到 `better-rm 1.0.0` 的版本資訊。
+
+**提示**：如果需要使用系統原生的 `rm` 命令，可以使用完整路徑 `/bin/rm` 或用反斜線 `\rm`。
+
+### 方法二：複製到 PATH 目錄
+
+如果你想讓 `better-rm` 可以直接執行（不只是透過 `rm` 別名），可以將它複製到 PATH 目錄：
+
+```bash
+# 下載專案
+git clone https://github.com/doggy8088/better-rm.git
+cd better-rm
+
+# 複製到 /usr/local/bin（需要 sudo 權限）
+sudo cp better-rm /usr/local/bin/
+sudo chmod +x /usr/local/bin/better-rm
+
+# 或複製到使用者的 bin 目錄（不需要 sudo）
+mkdir -p ~/bin
+cp better-rm ~/bin/
+chmod +x ~/bin/better-rm
+
+# 確保 ~/bin 在 PATH 中（在 ~/.bashrc 或 ~/.zshrc 加入）
+export PATH="$HOME/bin:$PATH"
+```
+
+然後可以選擇性設定別名：
+
+```bash
+# 在 ~/.bashrc 或 ~/.zshrc 中加入
+alias rm='better-rm'
+```
+
+重新載入設定檔：
+
+```bash
+source ~/.bashrc  # 或 source ~/.zshrc
+```
 
 ## 使用方式
 

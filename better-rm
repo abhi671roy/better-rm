@@ -1,0 +1,500 @@
+#!/bin/bash
+#
+# better-rm - A safer rm command that moves files to trash instead of permanent deletion
+# 更安全的 rm 命令，將檔案移至垃圾桶而非永久刪除
+#
+
+# 設定垃圾桶目錄 (可透過環境變數 TRASH_DIR 更改)
+# Set trash directory (can be changed via TRASH_DIR environment variable)
+TRASH_DIR="${TRASH_DIR:-$HOME/.Trash}"
+
+# 受保護的目錄清單 - 禁止刪除這些重要目錄
+# Protected directories list - prevent deletion of these critical directories
+PROTECTED_DIRS=(
+    "/"
+    "/bin"
+    "/boot"
+    "/dev"
+    "/etc"
+    "/home"
+    "/lib"
+    "/lib64"
+    "/opt"
+    "/proc"
+    "/root"
+    "/sbin"
+    "/sys"
+    "/usr"
+    "/var"
+    "$HOME"
+    "$HOME/"
+)
+
+# 受保護的目錄模式清單 (使用萬用字元)
+# Protected directory patterns (using wildcards)
+PROTECTED_PATTERNS=(
+    ".git"
+    ".git/"
+    "*/.git"
+    "*/.git/"
+)
+
+# 顏色定義 (Color definitions)
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+
+# 顯示錯誤訊息
+# Display error message
+error_msg() {
+    echo -e "${RED}錯誤 (Error): $1${NC}" >&2
+}
+
+# 顯示警告訊息
+# Display warning message
+warn_msg() {
+    echo -e "${YELLOW}警告 (Warning): $1${NC}" >&2
+}
+
+# 顯示成功訊息
+# Display success message
+success_msg() {
+    echo -e "${GREEN}$1${NC}"
+}
+
+# 正規化路徑函式
+# Normalize path function
+normalize_path() {
+    local path="$1"
+    # 移除多餘的斜線
+    # Remove multiple slashes
+    path=$(echo "$path" | sed 's#/\+#/#g')
+    
+    # 處理 ./ 和 ../
+    # Handle ./ and ../
+    local IFS='/'
+    local parts=()
+    local part
+    
+    for part in $path; do
+        if [ "$part" = ".." ]; then
+            # 移除上一個元素（如果存在）
+            if [ ${#parts[@]} -gt 0 ]; then
+                unset 'parts[${#parts[@]}-1]'
+                parts=("${parts[@]}")  # 重新索引陣列
+            fi
+        elif [ "$part" != "." ] && [ -n "$part" ]; then
+            parts+=("$part")
+        fi
+    done
+    
+    # 重建路徑
+    local normalized=""
+    if [[ "$path" = /* ]]; then
+        normalized="/"
+    fi
+    
+    local first=1
+    for part in "${parts[@]}"; do
+        if [ $first -eq 1 ]; then
+            normalized="${normalized}${part}"
+            first=0
+        else
+            normalized="${normalized}/${part}"
+        fi
+    done
+    
+    # 如果結果為空且原始路徑以 / 開頭，返回 /
+    if [ -z "$normalized" ] && [[ "$path" = /* ]]; then
+        normalized="/"
+    fi
+    
+    echo "$normalized"
+}
+
+# 檢查路徑是否為受保護的目錄
+# Check if path is a protected directory
+is_protected() {
+    local path="$1"
+    local real_path
+    
+    # 取得絕對路徑
+    # Get absolute path
+    if [ -e "$path" ] || [ -L "$path" ]; then
+        # 如果檔案存在，使用 readlink/realpath
+        real_path=$(readlink -f "$path" 2>/dev/null)
+        if [ -z "$real_path" ]; then
+            real_path=$(realpath "$path" 2>/dev/null)
+        fi
+        if [ -z "$real_path" ]; then
+            # 兩者都失敗，手動解析
+            if [[ "$path" = /* ]]; then
+                real_path="$path"
+            else
+                real_path="$(pwd)/$path"
+            fi
+            real_path=$(normalize_path "$real_path")
+        fi
+    else
+        # 如果路徑不存在，嘗試解析相對路徑
+        # If path doesn't exist, try to resolve relative path
+        if [[ "$path" = /* ]]; then
+            real_path="$path"
+        else
+            real_path="$(pwd)/$path"
+        fi
+        real_path=$(normalize_path "$real_path")
+    fi
+    
+    # 移除結尾的斜線以便比較
+    # Remove trailing slash for comparison
+    real_path="${real_path%/}"
+    
+    # 檢查是否與受保護目錄完全符合
+    # Check if exactly matches protected directories
+    for protected in "${PROTECTED_DIRS[@]}"; do
+        protected="${protected%/}"
+        if [ "$real_path" = "$protected" ]; then
+            return 0  # 是受保護的目錄
+        fi
+    done
+    
+    # 檢查是否符合受保護的模式
+    # Check if matches protected patterns
+    local basename_path=$(basename "$real_path")
+    for pattern in "${PROTECTED_PATTERNS[@]}"; do
+        pattern="${pattern%/}"
+        if [[ "$basename_path" = ${pattern} ]] || [[ "$real_path" = */${pattern} ]] || [[ "$real_path" = ${pattern} ]]; then
+            return 0  # 符合受保護模式
+        fi
+    done
+    
+    return 1  # 不是受保護的目錄
+}
+
+# 顯示使用說明
+# Display usage information
+show_help() {
+    cat << EOF
+better-rm - 更安全的 rm 命令替代方案
+A safer alternative to the rm command
+
+用法 (Usage): rm [選項] [檔案或目錄...]
+  
+選項 (Options):
+  -r, -R, --recursive    遞迴刪除目錄及其內容
+  -f, --force            強制刪除，忽略不存在的檔案，不提示
+  -i                     每次刪除前提示確認
+  -I                     刪除超過三個檔案或遞迴刪除前提示一次
+  -v, --verbose          顯示詳細操作過程
+  --help                 顯示此說明訊息
+  --version              顯示版本資訊
+
+環境變數 (Environment Variables):
+  TRASH_DIR              垃圾桶目錄位置 (預設: ~/.Trash)
+
+說明 (Description):
+  此命令會將檔案移至垃圾桶而非永久刪除。
+  垃圾桶位於 $TRASH_DIR 目錄。
+  
+  This command moves files to trash instead of permanent deletion.
+  Trash is located at $TRASH_DIR directory.
+
+範例 (Examples):
+  rm file.txt                    # 刪除單一檔案
+  rm -r directory/               # 刪除目錄
+  rm -rf old_project/            # 強制刪除目錄
+  TRASH_DIR=/tmp/trash rm file   # 使用自訂垃圾桶目錄
+
+EOF
+}
+
+# 顯示版本資訊
+# Display version information
+show_version() {
+    echo "better-rm 1.0.0"
+    echo "更安全的 rm 命令 - 將檔案移至垃圾桶而非永久刪除"
+    echo "A safer rm command - moves files to trash instead of permanent deletion"
+}
+
+# 移動檔案至垃圾桶
+# Move file to trash
+move_to_trash() {
+    local source="$1"
+    local verbose="$2"
+    
+    # 檢查檔案或目錄是否存在
+    # Check if file or directory exists
+    if [ ! -e "$source" ] && [ ! -L "$source" ]; then
+        if [ "$force_mode" != "1" ]; then
+            error_msg "無法移除 '$source': 沒有此一檔案或目錄"
+            error_msg "cannot remove '$source': No such file or directory"
+            return 1
+        fi
+        return 0  # 在強制模式下，忽略不存在的檔案
+    fi
+    
+    # 檢查是否為受保護的目錄
+    # Check if it's a protected directory
+    if is_protected "$source"; then
+        error_msg "拒絕刪除受保護的目錄: '$source'"
+        error_msg "Refused to remove protected directory: '$source'"
+        error_msg "這是一個重要的系統目錄或專案目錄！"
+        error_msg "This is a critical system or project directory!"
+        return 1
+    fi
+    
+    # 取得絕對路徑
+    # Get absolute path
+    local abs_path
+    if [ -e "$source" ] || [ -L "$source" ]; then
+        abs_path=$(readlink -f "$source" 2>/dev/null)
+        if [ -z "$abs_path" ]; then
+            abs_path=$(realpath "$source" 2>/dev/null)
+        fi
+        if [ -z "$abs_path" ]; then
+            # 手動計算絕對路徑
+            if [[ "$source" = /* ]]; then
+                abs_path="$source"
+            else
+                abs_path="$(cd "$(dirname "$source")" 2>/dev/null && pwd)/$(basename "$source")"
+            fi
+        fi
+    else
+        if [[ "$source" = /* ]]; then
+            abs_path="$source"
+        else
+            abs_path="$(pwd)/$source"
+        fi
+    fi
+    
+    # 建立垃圾桶目錄結構
+    # Create trash directory structure
+    local trash_path="$TRASH_DIR$(dirname "$abs_path")"
+    mkdir -p "$trash_path" 2>/dev/null || {
+        error_msg "無法建立垃圾桶目錄: $trash_path"
+        error_msg "Failed to create trash directory: $trash_path"
+        return 1
+    }
+    
+    # 目標路徑
+    # Target path
+    local target="$TRASH_DIR$abs_path"
+    
+    # 如果目標已存在，加上時間戳記
+    # If target exists, add timestamp
+    if [ -e "$target" ]; then
+        local timestamp=$(date +%Y%m%d_%H%M%S)
+        target="${target}_${timestamp}"
+    fi
+    
+    # 移動檔案到垃圾桶
+    # Move file to trash
+    if mv "$source" "$target" 2>/dev/null; then
+        if [ "$verbose" = "1" ]; then
+            success_msg "已移除 '$source' (moved to trash: $target)"
+        fi
+        return 0
+    else
+        error_msg "無法移除 '$source'"
+        error_msg "Failed to remove '$source'"
+        return 1
+    fi
+}
+
+# 主程式
+# Main program
+main() {
+    # 參數解析變數
+    # Parameter parsing variables
+    local recursive=0
+    local force_mode=0
+    local interactive=0
+    local interactive_once=0
+    local verbose=0
+    local files=()
+    
+    # 如果沒有參數，顯示錯誤
+    # If no arguments, show error
+    if [ $# -eq 0 ]; then
+        error_msg "缺少操作對象"
+        error_msg "missing operand"
+        echo "Try 'rm --help' for more information." >&2
+        return 1
+    fi
+    
+    # 解析參數
+    # Parse arguments
+    while [ $# -gt 0 ]; do
+        case "$1" in
+            --help)
+                show_help
+                return 0
+                ;;
+            --version)
+                show_version
+                return 0
+                ;;
+            -r|-R|--recursive)
+                recursive=1
+                shift
+                ;;
+            -f|--force)
+                force_mode=1
+                interactive=0  # -f 覆蓋 -i
+                shift
+                ;;
+            -i)
+                interactive=1
+                force_mode=0  # -i 覆蓋 -f
+                shift
+                ;;
+            -I)
+                interactive_once=1
+                shift
+                ;;
+            -v|--verbose)
+                verbose=1
+                shift
+                ;;
+            -rf|-fr|-Rf|-fR|-RF|-Fr|-rF|-RF)
+                # 組合參數處理 - 只處理常見的 rf 組合
+                # Handle combined parameters - only common rf combinations
+                recursive=1
+                force_mode=1
+                interactive=0
+                shift
+                ;;
+            -*)
+                # 處理其他組合參數
+                # Handle other combined parameters
+                local arg="$1"
+                shift
+                local i
+                local has_f=0
+                local has_i=0
+                local f_pos=-1
+                local i_pos=-1
+                
+                # 第一次掃描：找出 f 和 i 的位置
+                for ((i=1; i<${#arg}; i++)); do
+                    case "${arg:$i:1}" in
+                        f) has_f=1; f_pos=$i ;;
+                        i) has_i=1; i_pos=$i ;;
+                    esac
+                done
+                
+                # 第二次掃描：處理所有選項
+                for ((i=1; i<${#arg}; i++)); do
+                    case "${arg:$i:1}" in
+                        r|R) recursive=1 ;;
+                        f) 
+                            # 如果 i 也存在且在 f 之後，則 i 優先
+                            if [ $has_i -eq 1 ] && [ $i_pos -gt $f_pos ]; then
+                                : # 什麼都不做，讓 i 處理
+                            else
+                                force_mode=1
+                                interactive=0
+                            fi
+                            ;;
+                        i) 
+                            # 如果 f 也存在且在 i 之後，則 f 優先
+                            if [ $has_f -eq 1 ] && [ $f_pos -gt $i_pos ]; then
+                                : # 什麼都不做，讓 f 處理
+                            else
+                                interactive=1
+                                force_mode=0
+                            fi
+                            ;;
+                        I) interactive_once=1 ;;
+                        v) verbose=1 ;;
+                        *)
+                            error_msg "無效的選項 -- '${arg:$i:1}'"
+                            error_msg "invalid option -- '${arg:$i:1}'"
+                            echo "Try 'rm --help' for more information." >&2
+                            return 1
+                            ;;
+                    esac
+                done
+                ;;
+            *)
+                files+=("$1")
+                shift
+                ;;
+        esac
+    done
+    
+    # 檢查是否有指定檔案
+    # Check if files are specified
+    if [ ${#files[@]} -eq 0 ]; then
+        error_msg "缺少操作對象"
+        error_msg "missing operand"
+        echo "Try 'rm --help' for more information." >&2
+        return 1
+    fi
+    
+    # -I 選項：當刪除超過 3 個檔案時提示一次
+    # -I option: prompt once when removing more than 3 files
+    if [ "$interactive_once" = "1" ] && [ ${#files[@]} -gt 3 ]; then
+        echo -n "rm: remove ${#files[@]} arguments? " >&2
+        read -r response
+        if [[ ! "$response" =~ ^[yY] ]]; then
+            return 0
+        fi
+    fi
+    
+    # 確保垃圾桶目錄存在
+    # Ensure trash directory exists
+    if [ ! -d "$TRASH_DIR" ]; then
+        mkdir -p "$TRASH_DIR" || {
+            error_msg "無法建立垃圾桶目錄: $TRASH_DIR"
+            error_msg "Failed to create trash directory: $TRASH_DIR"
+            return 1
+        }
+    fi
+    
+    # 處理每個檔案
+    # Process each file
+    local status=0
+    for file in "${files[@]}"; do
+        # 檢查是否為目錄
+        # Check if it's a directory
+        if [ -d "$file" ] && [ ! -L "$file" ]; then
+            if [ "$recursive" != "1" ]; then
+                error_msg "無法移除 '$file': 是一個目錄"
+                error_msg "cannot remove '$file': Is a directory"
+                status=1
+                continue
+            fi
+        fi
+        
+        # 互動式確認
+        # Interactive confirmation
+        if [ "$interactive" = "1" ]; then
+            local prompt
+            if [ -d "$file" ] && [ ! -L "$file" ]; then
+                prompt="rm: descend into directory '$file'? "
+            else
+                prompt="rm: remove file '$file'? "
+            fi
+            echo -n "$prompt" >&2
+            read -r response
+            if [[ ! "$response" =~ ^[yY] ]]; then
+                continue
+            fi
+        fi
+        
+        # 移動到垃圾桶
+        # Move to trash
+        if ! move_to_trash "$file" "$verbose"; then
+            status=1
+        fi
+    done
+    
+    return $status
+}
+
+# 執行主程式
+# Execute main program
+main "$@"

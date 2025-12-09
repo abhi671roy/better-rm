@@ -376,7 +376,7 @@ find ~/.Trash -mtime +30 -delete
 /bin/rm file.txt
 ```
 
-或暫時停用別名：
+或用反斜線暫時繞過別名（bypass alias）：
 ```bash
 \rm file.txt
 ```

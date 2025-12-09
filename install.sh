@@ -182,8 +182,8 @@ install() {
     echo "提示 (Tips):"
     echo "  • 檔案會被移至 ~/.Trash 而非永久刪除"
     echo "    Files will be moved to ~/.Trash instead of permanent deletion"
-    echo "  • 如需使用原生 rm: /bin/rm 或 \\rm"
-    echo "    To use native rm: /bin/rm or \\rm"
+    echo "  • 如需使用原生 rm: /bin/rm 或 \\rm (反斜線可繞過別名)"
+    echo "    To use native rm: /bin/rm or \\rm (backslash bypasses alias)"
     echo ""
 }
 

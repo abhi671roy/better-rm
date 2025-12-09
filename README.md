@@ -360,7 +360,7 @@ mv ~/.Trash/home/user/projects/myapp/file.txt /home/user/projects/myapp/
 2. **磁碟空間**：垃圾桶會佔用磁碟空間，需要定期清理。
 3. **權限問題**：如果你沒有權限移動某個檔案，操作會失敗。
 
-## 安全性考量
+## 安全性考量 / Security Considerations
 
 ### ⚠️ 使用限制與風險 / Limitations and Risks
 

@@ -169,7 +169,7 @@ install() {
     echo -e "${YELLOW}This tool CANNOT replace a complete backup strategy!${NC}"
     echo ""
     echo -e "${YELLOW}請定期備份重要資料到外部儲存或雲端服務。${NC}"
-    echo -e "${YELLOW}Always backup important data to external storage or cloud.${NC}"
+    echo -e "${YELLOW}Always back up important data to external storage or cloud.${NC}"
     echo ""
     echo -e "${YELLOW}作者不對任何資料遺失負責，使用者需自行承擔風險。${NC}"
     echo -e "${YELLOW}Author is not responsible for data loss. Users assume all risks.${NC}"

